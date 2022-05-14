@@ -35,6 +35,17 @@ async function run() {
         await client.connect()
         const manageCollection = client.db('WareHouse').collection('ManageItem')
 
+
+         // AUTH
+         app.post('/login', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '30d'
+            });
+            res.send({ accessToken });
+        })
+
+
         // item api
         app.get('/item', async (req, res) => {
             const query = {}
@@ -46,6 +57,7 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const item = await manageCollection.findOne(query);
+            console.log(item);
             res.send(item);
         });
 
@@ -54,6 +66,8 @@ async function run() {
         // POST api
         app.post('/item', async (req, res) => {
             const newItem = req.body;
+            const tokenInfo =req.headers.authorization
+            console.log(tokenInfo)
             const result = await manageCollection.insertOne(newItem);
             res.send(result);
         });
@@ -65,16 +79,18 @@ async function run() {
             const result = await manageCollection.deleteOne(query);
             res.send(result);
         });
+
+
         // Order Collection API
 
-        app.get('/myitem', verifyJWT, async (req, res) => {
+        app.get('/items', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email;
             const email = req.query.email;
             if (email === decodedEmail) {
                 const query = { email: email };
                 const cursor = manageCollection.find(query);
-                const orders = await cursor.toArray();
-                res.send(orders);
+                const myItems = await cursor.toArray();
+                res.send(myItems);
             }
             else{
                 res.status(403).send({message: 'forbidden access'})
@@ -83,6 +99,7 @@ async function run() {
 
         // update quantity 
         app.put('/item/:id', async (req, res) => {
+            console.log(item);
             const id = req.params.id
             const data = req.body
             const filter = { _id: ObjectId(id) }

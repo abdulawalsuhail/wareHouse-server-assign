@@ -40,7 +40,7 @@ async function run() {
          app.post('/login', async (req, res) => {
             const user = req.body;
             const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: '30d'
+                expiresIn: '2d'
             });
             res.send({ accessToken });
         })
@@ -99,7 +99,7 @@ async function run() {
 
         // update quantity 
         app.put('/item/:id', async (req, res) => {
-            console.log(item);
+            
             const id = req.params.id
             const data = req.body
             const filter = { _id: ObjectId(id) }

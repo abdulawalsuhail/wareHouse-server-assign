@@ -39,9 +39,7 @@ async function run() {
          // AUTH
          app.post('/login', async (req, res) => {
             const user = req.body;
-            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: '2d'
-            });
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
             res.send({ accessToken });
         })
 
@@ -83,7 +81,7 @@ async function run() {
 
         // Order Collection API
 
-        app.get('/items', verifyJWT, async (req, res) => {
+        app.get('/myitems', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email;
             const email = req.query.email;
             if (email === decodedEmail) {
